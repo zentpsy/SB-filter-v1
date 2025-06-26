@@ -9,8 +9,8 @@ st.set_page_config(page_title="Excel Filter App - Supabase", layout="wide")
 st.title("📊 ข้อมูล - งบประมาณ ปี 2561-2568 จาก Supabase")
 
 # --- เชื่อมต่อ Supabase ---
-SUPABASE_URL = st.secrets["supabase_url"]
-SUPABASE_KEY = st.secrets["supabase_key"]
+SUPABASE_URL = st.secrets["url"]
+SUPABASE_KEY = st.secrets["key"]
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 TABLE_NAME = "budget_data"
 
