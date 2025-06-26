@@ -9,7 +9,7 @@ SUPABASE_KEY = st.secrets["supabase"]["key"]
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- ชื่อ Table ใน Supabase ---
-TABLE_NAME = "budget_data"
+TABLE_NAME = "budgets"
 
 # --- ตั้งค่า Layout ---
 st.set_page_config(page_title="📊 งบประมาณ 61-68", layout="wide")
