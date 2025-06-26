@@ -116,6 +116,7 @@ else:
     st.warning("⚠️ ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่เลือก")
 
 st.markdown("### 📄 ตารางข้อมูล")
+filtered_df = filtered_df.drop(columns=["id"], errors="ignore")
 st.dataframe(filtered_df, use_container_width=True)
 
 # --- Excel Download ---
