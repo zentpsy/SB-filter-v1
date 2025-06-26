@@ -1,37 +1,35 @@
 import streamlit as st
 import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
 import re
 from io import BytesIO
+from supabase import create_client, Client
 
-st.set_page_config(page_title="Excel Filter App - Google Sheets", layout="wide")
-st.title("📊 ข้อมูล - งบประมาณ ปี 2561-2568 จาก Google Sheets")
+# --- ตั้งค่าหน้าเว็บ ---
+st.set_page_config(page_title="Excel Filter App - Supabase", layout="wide")
+st.title("📊 ข้อมูล - งบประมาณ ปี 2561-2568 จาก Supabase")
 
-# --- เชื่อม Google Sheets ด้วย Service Account จาก Secrets ---
-creds_info = st.secrets["gcp_service_account"]
-credentials = Credentials.from_service_account_info(
-    creds_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
-gc = gspread.authorize(credentials)
+# --- เชื่อมต่อ Supabase ---
+SUPABASE_URL = st.secrets["supabase_url"]
+SUPABASE_KEY = st.secrets["supabase_key"]
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+TABLE_NAME = "budget_data"
 
-SPREADSHEET_ID = "1Pjf0A4-M9NTxkK8Cj0AMCMiLmazfQNqq7zRb3Lnw2G8"
-WORKSHEET_NAME = "Sheet1"
-
-sheet = gc.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
-
-@st.cache_data(ttl=0, show_spinner="🛁 กำลังโดนข้อมูลจาก Google Sheets...")
+# --- โหลดข้อมูลจาก Supabase ---
+@st.cache_data(ttl=0, show_spinner="📡 กำลังโหลดข้อมูลจาก Supabase...")
 def load_data():
-    return sheet.get_all_records()
+    response = supabase.table(TABLE_NAME).select("*").execute()
+    return pd.DataFrame(response.data)
 
-data = load_data()
-df = pd.DataFrame(data)
+df = load_data()
 
+# --- ตรวจสอบคอลัมน์ ---
 required_columns = ["ลำดับ", "โครงการ", "รูปแบบงบประมาณ", "ปีงบประมาณ", "หน่วยงาน",
                     "สถานที่", "หมู่ที่", "ตำบล", "อำเภอ", "จังหวัด"]
 if not all(col in df.columns for col in required_columns):
-    st.error("ไฟล์ Google Sheets ไม่มีคอลัมน์ที่ต้องการ หรือชื่อคอลัมน์ไม่ถูกต้อง")
+    st.error("ตาราง Supabase ไม่มีคอลัมน์ที่ต้องการ หรือชื่อคอลัมน์ไม่ถูกต้อง")
     st.stop()
 
+# --- ฟังก์ชัน ---
 def extract_number(s):
     match = re.search(r"\d+", str(s))
     return int(match.group()) if match else float('inf')
@@ -48,6 +46,7 @@ def get_options(df, col_name):
 
 filtered_for_options = df.copy()
 
+# --- ตัวกรอง ---
 col1, col2 = st.columns(2)
 col3, col4 = st.columns(2)
 
@@ -79,6 +78,7 @@ with col4:
     if "ทั้งหมด" not in selected_departments:
         filtered_for_options = filtered_for_options[filtered_for_options["หน่วยงาน"].isin(selected_departments)]
 
+# --- กรองข้อมูล ---
 filtered_df = df.copy()
 
 if selected_budget != "ทั้งหมด":
@@ -100,11 +100,12 @@ if not filtered_df.empty:
         unsafe_allow_html=True
     )
 else:
-    st.warning("⚠️ ไม่พบข้อมูลที่ตรงกับเงื่อนไข")
+    st.warning("⚠️ ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่เลือก")
 
 st.markdown("### 📄 ตารางข้อมูล")
 st.dataframe(filtered_df, use_container_width=True)
 
+# --- Excel Download ---
 def to_excel_bytes(df_to_export):
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
@@ -116,7 +117,7 @@ col_up, spacer, col_dl = st.columns([1,2,1])
 with col_dl:
     if not filtered_df.empty:
         st.download_button(
-            label="📅 ดาวน์โหลดข้อมูลที่กรองเป็น Excel",
+            label="📥 ดาวน์โหลดข้อมูลที่กรองเป็น Excel",
             data=to_excel_bytes(filtered_df),
             file_name="filtered_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -135,7 +136,9 @@ with col_up:
             if missing_cols:
                 st.error(f"❌ คอลัมน์เหล่านี้หายไปจากไฟล์ที่อัปโหลด: {', '.join(missing_cols)}")
             else:
-                sheet.append_rows(uploaded_df.values.tolist(), value_input_option="USER_ENTERED")
-                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Google Sheets เรียบร้อยแล้ว")
+                for _, row in uploaded_df.iterrows():
+                    data = row.to_dict()
+                    supabase.table(TABLE_NAME).insert(data).execute()
+                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase เรียบร้อยแล้ว")
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
