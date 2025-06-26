@@ -116,8 +116,14 @@ else:
     st.warning("⚠️ ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่เลือก")
 
 st.markdown("### 📄 ตารางข้อมูล")
-filtered_df = filtered_df.drop(columns=["id"], errors="ignore")
+# ลบคอลัมน์ไม่มีชื่อ
+filtered_df = filtered_df.drop(columns=[col for col in filtered_df.columns if not col or "unnamed" in str(col).lower()], errors="ignore")
+
+# แสดงเฉพาะคอลัมน์ที่ต้องการ
+filtered_df = filtered_df[required_columns]
+
 st.dataframe(filtered_df, use_container_width=True)
+
 
 # --- Excel Download ---
 def to_excel_bytes(df_to_export):
