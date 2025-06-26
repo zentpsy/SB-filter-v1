@@ -12,7 +12,7 @@ st.title("📊 ข้อมูล - งบประมาณ ปี 2561-2568 �
 SUPABASE_URL = st.secrets["url"]
 SUPABASE_KEY = st.secrets["key"]
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-TABLE_NAME = "budget_data"
+TABLE_NAME = "budgets"
 
 # --- โหลดข้อมูลจาก Supabase ---
 @st.cache_data(ttl=0, show_spinner="📡 กำลังโหลดข้อมูลจาก Supabase...")
