@@ -17,14 +17,21 @@ TABLE_NAME = "budgets"
 # --- โหลดข้อมูลจาก Supabase ---
 @st.cache_data(ttl=0, show_spinner="📡 กำลังโหลดข้อมูลจาก Supabase...")
 def load_data():
-    # Step 1: ดึงจำนวน records ทั้งหมดก่อน
-    count_response = supabase.table(TABLE_NAME).select("id", count="exact").execute()
-    total_records = count_response.count or 0
+    page_size = 1000
+    offset = 0
+    all_data = []
 
-    # Step 2: ดึงข้อมูลทั้งหมดด้วย range
-    response = supabase.table(TABLE_NAME).select("*").range(0, total_records - 1).execute()
-    return pd.DataFrame(response.data)
+    while True:
+        response = supabase.table(TABLE_NAME).select("*").range(offset, offset + page_size - 1).execute()
+        batch = response.data
+        if not batch:
+            break
+        all_data.extend(batch)
+        if len(batch) < page_size:
+            break
+        offset += page_size
 
+    return pd.DataFrame(all_data)
 
 df = load_data()
 
