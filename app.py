@@ -162,3 +162,5 @@ with col_up:
                 st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase เรียบร้อยแล้ว")
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
+
+st.write(df.columns.tolist())
