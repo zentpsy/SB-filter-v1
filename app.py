@@ -147,16 +147,24 @@ with tab_chart:
             text_auto=True,
             title="จำนวนโครงการตามรูปแบบงบประมาณในแต่ละปี"
         )
-
+        
         fig.update_layout(
             height=450,
-            margin=dict(l=20, r=20, t=50, b=20),
-            legend=dict(title=""),
+            margin=dict(l=20, r=20, t=50, b=50),
+            legend=dict(
+                title="",
+                orientation="h",
+                yanchor="bottom",
+                y=-0.3,
+                xanchor="center",
+                x=0.5
+            ),
             xaxis_title="ปีงบประมาณ",
             yaxis_title="จำนวนโครงการ",
         )
-
+        
         st.plotly_chart(fig, use_container_width=True)
+
     else:
         st.warning("ไม่มีข้อมูลที่จะแสดงในกราฟ")
 
