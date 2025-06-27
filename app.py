@@ -156,11 +156,16 @@ with col_up:
             if missing_cols:
                 st.error(f"❌ คอลัมน์เหล่านี้หายไปจากไฟล์ที่อัปโหลด: {', '.join(missing_cols)}")
             else:
-                for _, row in uploaded_df.iterrows():
-                    data = row.to_dict()
-                    supabase.table(TABLE_NAME).insert(data).execute()
-                 st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase เรียบร้อยแล้ว")
-                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวเรียบร้อยแล้ว: " +
-           ", ".join(uploaded_df['โครงการ'].astype(str).unique()[:3]) + "...")
+                # แทรกข้อมูลทั้งหมดในครั้งเดียว
+supabase.table(TABLE_NAME).insert(uploaded_df.to_dict(orient="records")).execute()
+
+# แสดงชื่อโครงการที่อัปโหลด
+project_names = uploaded_df['โครงการ'].dropna().unique().tolist()
+sample_projects = ", ".join(project_names[:3])  # แสดงชื่อแค่ 3 อันแรก
+more_text = "..." if len(project_names) > 3 else ""
+
+st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว\n"
+           f"📌 โครงการที่เพิ่ม: {sample_projects}{more_text}")
+
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
