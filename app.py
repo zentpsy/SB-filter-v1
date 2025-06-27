@@ -129,7 +129,7 @@ if not filtered_df.empty:
     # แปลงปีงบประมาณให้เป็น str
     grouped = (
         filtered_df.groupby(["ปีงบประมาณ", "รูปแบบงบประมาณ"])
-        .size(2)
+        .size()
         .reset_index(name="จำนวนโครงการ")
     )
 
