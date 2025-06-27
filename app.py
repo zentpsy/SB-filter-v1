@@ -121,7 +121,7 @@ with tab_table:
     filtered_df = filtered_df.drop(columns=["id"], errors="ignore")
     st.dataframe(filtered_df, use_container_width=True)
     
-import altair as alt
+
 import plotly.express as px
 
 with tab_chart:
