@@ -159,6 +159,7 @@ with col_up:
                 for _, row in uploaded_df.iterrows():
                     data = row.to_dict()
                     supabase.table(TABLE_NAME).insert(data).execute()
+                 st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase เรียบร้อยแล้ว")
                 st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวเรียบร้อยแล้ว: " +
            ", ".join(uploaded_df['โครงการ'].astype(str).unique()[:3]) + "...")
         except Exception as e:
