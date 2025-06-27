@@ -194,6 +194,5 @@ with col_up:
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
 
+st.write(chart_data.head())
 
-        except Exception as e:
-            st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
