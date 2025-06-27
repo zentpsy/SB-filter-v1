@@ -160,8 +160,9 @@ with col_up:
                 project_names = uploaded_df['โครงการ'].dropna().unique().tolist()
                 sample_projects = ", ".join(project_names[:3])
                 more_text = "..." if len(project_names) > 3 else ""
-                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว"
-                           f"\n📌 โครงการที่เพิ่ม: {sample_projects}{more_text}")
+                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว")
+                st.info(f"📌 โครงการที่เพิ่ม:\n{sample_projects}{more_text}")
+
                 st.balloons()  # 🎈
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
