@@ -118,6 +118,7 @@ else:
 tab_table, tab_chart = st.tabs(["📄 ตารางข้อมูล", "📊 กราฟสรุป"])
 
 with tab_table:
+    filtered_df = filtered_df.drop(columns=["id"], errors="ignore")
     st.dataframe(filtered_df, use_container_width=True)
 
 with tab_chart:
