@@ -163,7 +163,7 @@ with col_up:
                 sample_projects = ", ".join(project_names[:3])  # แสดงชื่อแค่ 3 อันแรก
                 more_text = "..." if len(project_names) > 3 else ""
 
-                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว\n"
+                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว \n"
                            f"📌 โครงการที่เพิ่ม: {sample_projects}{more_text}")
 
 
