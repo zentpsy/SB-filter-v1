@@ -193,6 +193,3 @@ with col_up:
                 st.balloons()  # 🎈
         except Exception as e:
             st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
-
-st.write(chart_data.head())
-
