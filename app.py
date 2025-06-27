@@ -115,14 +115,6 @@ if not filtered_df.empty:
 else:
     st.warning("⚠️ ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่เลือก")
 
-st.markdown("### 📄 ตารางข้อมูล")
-# ลบคอลัมน์ไม่มีชื่อ
-filtered_df = filtered_df.drop(columns=[col for col in filtered_df.columns if not col or "unnamed" in str(col).lower()], errors="ignore")
-
-# แสดงเฉพาะคอลัมน์ที่ต้องการ
-filtered_df = filtered_df[required_columns]
-
-st.dataframe(filtered_df, use_container_width=True)
 tab_table, tab_chart = st.tabs(["📄 ตารางข้อมูล", "📊 กราฟสรุป"])
 
 with tab_table:
@@ -144,6 +136,7 @@ with tab_chart:
         st.bar_chart(pivot_df)
     else:
         st.warning("ไม่มีข้อมูลที่จะแสดงในกราฟ")
+
 
 # --- Excel Download ---
 def to_excel_bytes(df_to_export):
