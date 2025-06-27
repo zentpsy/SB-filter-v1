@@ -4,9 +4,200 @@ import re
 from io import BytesIO
 from supabase import create_client, Client
 
+# --- Custom CSS ---
+st.markdown("""
+<style>
+    /* Global Styling */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    /* Main container */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+        margin: 1rem;
+    }
+    
+    /* Title styling */
+    .main-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Filter cards */
+    .filter-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 1rem;
+        border-radius: 15px;
+        margin: 0.5rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+    
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        background: rgba(255,255,255,0.9);
+        border-radius: 10px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    
+    /* Multiselect styling */
+    .stMultiSelect > div > div {
+        background: rgba(255,255,255,0.9);
+        border-radius: 10px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .stMultiSelect > div > div:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    
+    /* Results card */
+    .results-card {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 1rem 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 20px;
+        background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+        border-radius: 15px;
+        padding: 0.5rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: rgba(255,255,255,0.7);
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+    }
+    
+    /* Dataframe styling */
+    .stDataFrame {
+        background: rgba(255,255,255,0.95);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    /* Download button */
+    .stDownloadButton > button {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .stDownloadButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255,107,107,0.6);
+    }
+    
+    /* Upload section */
+    .upload-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 1rem 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        color: white;
+    }
+    
+    .upload-section .stFileUploader {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Warning and success messages */
+    .stAlert {
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Plotly chart container */
+    .js-plotly-plot {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    /* Animation for loading */
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .loading {
+        animation: pulse 2s infinite;
+    }
+    
+    /* Emoji enhancement */
+    .emoji-large {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+    
+    /* Card hover effects */
+    .hover-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # --- ตั้งค่าหน้าเว็บ ---
-st.set_page_config(page_title="Excel Filter App - Supabase", layout="wide")
-st.title("📊 ข้อมูล - งบประมาณ ปี 2561-2568 จาก Supabase")
+st.set_page_config(page_title="Excel Filter App - Supabase", layout="wide", page_icon="📊")
+
+# Custom title with styling
+st.markdown('<h1 class="main-title">📊 ข้อมูล - งบประมาณ ปี 2561-2568 จาก Supabase</h1>', unsafe_allow_html=True)
 
 # --- เชื่อมต่อ Supabase ---
 SUPABASE_URL = st.secrets["supabase_url"]
@@ -33,13 +224,15 @@ def load_data():
 
     return pd.DataFrame(all_data)
 
-df = load_data()
+# Loading animation
+with st.spinner('🎨 กำลังโหลดข้อมูล...'):
+    df = load_data()
 
 # --- ตรวจสอบคอลัมน์ ---
 required_columns = ["ลำดับ", "โครงการ", "รูปแบบงบประมาณ", "ปีงบประมาณ", "หน่วยงาน",
                     "สถานที่", "หมู่ที่", "ตำบล", "อำเภอ", "จังหวัด"]
 if not all(col in df.columns for col in required_columns):
-    st.error("ตาราง Supabase ไม่มีคอลัมน์ที่ต้องการ หรือชื่อคอลัมน์ไม่ถูกต้อง")
+    st.error("❌ ตาราง Supabase ไม่มีคอลัมน์ที่ต้องการ หรือชื่อคอลัมน์ไม่ถูกต้อง")
     st.stop()
 
 # --- ฟังก์ชัน ---
@@ -59,37 +252,46 @@ def get_options(df, col_name):
 
 filtered_for_options = df.copy()
 
-# --- ตัวกรอง ---
+# --- ส่วนตัวกรอง ---
+st.markdown('<div class="filter-section">', unsafe_allow_html=True)
+st.markdown("### 🎯 เลือกเงื่อนไขการกรองข้อมูล")
+
 col1, col2 = st.columns(2)
 col3, col4 = st.columns(2)
 
 with col1:
+    st.markdown('<div class="emoji-large">💰</div>', unsafe_allow_html=True)
     budget_options = get_options(filtered_for_options, "รูปแบบงบประมาณ")
-    selected_budget = st.selectbox("💰 รูปแบบงบประมาณ", budget_options, key="budget_select")
+    selected_budget = st.selectbox("รูปแบบงบประมาณ", budget_options, key="budget_select")
     if selected_budget != "ทั้งหมด":
         filtered_for_options = filtered_for_options[filtered_for_options["รูปแบบงบประมาณ"] == selected_budget]
 
 with col2:
+    st.markdown('<div class="emoji-large">📅</div>', unsafe_allow_html=True)
     year_options = get_options(filtered_for_options, "ปีงบประมาณ")
-    selected_year = st.selectbox("📅 ปีงบประมาณ", year_options, key="year_select")
+    selected_year = st.selectbox("ปีงบประมาณ", year_options, key="year_select")
     if selected_year != "ทั้งหมด":
         filtered_for_options = filtered_for_options[filtered_for_options["ปีงบประมาณ"].astype(str) == selected_year]
 
 with col3:
+    st.markdown('<div class="emoji-large">📌</div>', unsafe_allow_html=True)
     project_options = get_options(filtered_for_options, "โครงการ")
-    selected_project = st.selectbox("📌 โครงการ", project_options, key="project_select")
+    selected_project = st.selectbox("โครงการ", project_options, key="project_select")
     if selected_project != "ทั้งหมด":
         filtered_for_options = filtered_for_options[filtered_for_options["โครงการ"] == selected_project]
 
 with col4:
+    st.markdown('<div class="emoji-large">🏢</div>', unsafe_allow_html=True)
     department_options = get_options(filtered_for_options, "หน่วยงาน")
     default_departments = st.session_state.get("dept_select", ["ทั้งหมด"])
     valid_defaults = [d for d in default_departments if d in department_options]
     if not valid_defaults:
         valid_defaults = ["ทั้งหมด"]
-    selected_departments = st.multiselect("🏢 หน่วยงาน", department_options, default=valid_defaults, key="dept_select")
+    selected_departments = st.multiselect("หน่วยงาน", department_options, default=valid_defaults, key="dept_select")
     if "ทั้งหมด" not in selected_departments:
         filtered_for_options = filtered_for_options[filtered_for_options["หน่วยงาน"].isin(selected_departments)]
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # --- กรองข้อมูล ---
 filtered_df = df.copy()
@@ -106,28 +308,45 @@ if selected_project != "ทั้งหมด":
 if "ทั้งหมด" not in selected_departments:
     filtered_df = filtered_df[filtered_df["หน่วยงาน"].isin(selected_departments)]
 
+# Results display with beautiful styling
 if not filtered_df.empty:
     st.markdown(
-        f"<div style='font-size:24px; color:#3178c6; background-color:#d0e7ff; padding:10px; border-radius:6px;'>"
-        f"📈 พบข้อมูลทั้งหมด {len(filtered_df)} แห่ง</div>",
+        f'<div class="results-card hover-card">'
+        f'🎉 <strong>พบข้อมูลทั้งหมด {len(filtered_df):,} แห่ง</strong>'
+        f'</div>',
         unsafe_allow_html=True
     )
 else:
-    st.warning("⚠️ ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่เลือก")
+    st.markdown(
+        '<div class="results-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">'
+        '⚠️ <strong>ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่เลือก</strong>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
+# Enhanced tabs
 tab_table, tab_chart = st.tabs(["📄 ตารางข้อมูล", "📊 กราฟสรุป"])
 
 with tab_table:
-    filtered_df = filtered_df.drop(columns=["id"], errors="ignore")
-    st.dataframe(filtered_df, use_container_width=True)
-    
+    if not filtered_df.empty:
+        st.markdown("### 📋 รายละเอียดข้อมูลที่กรองแล้ว")
+        filtered_df_display = filtered_df.drop(columns=["id"], errors="ignore")
+        st.dataframe(filtered_df_display, use_container_width=True, height=500)
+    else:
+        st.markdown(
+            '<div style="text-align: center; padding: 3rem; color: #666;">'
+            '<h3>📭 ไม่มีข้อมูลที่จะแสดง</h3>'
+            '<p>กรุณาปรับเงื่อนไขการกรองใหม่</p>'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
 import plotly.express as px
 
 with tab_chart:
     if not filtered_df.empty:
-        import plotly.express as px
-
+        st.markdown("### 📈 สถิติและแนวโน้ม")
+        
         chart_data = (
             filtered_df.groupby(["ปีงบประมาณ", "รูปแบบงบประมาณ"])
             .size()
@@ -141,68 +360,138 @@ with tab_chart:
             color="รูปแบบงบประมาณ",
             barmode="group",
             text_auto=True,
-            title="จำนวนโครงการตามรูปแบบงบประมาณในแต่ละปี"
+            title="📊 จำนวนโครงการตามรูปแบบงบประมาณในแต่ละปี",
+            color_discrete_sequence=px.colors.qualitative.Set3
         )
 
         fig.update_layout(
-            height=450,
-            margin=dict(l=20, r=20, t=50, b=100),
+            height=500,
+            margin=dict(l=20, r=20, t=80, b=100),
             legend=dict(
                 title="",
                 orientation="h",
                 yanchor="bottom",
-                y=-0.45,
-                xanchor="left",
-                x=0
+                y=-0.3,
+                xanchor="center",
+                x=0.5
             ),
             xaxis_title="ปีงบประมาณ",
             yaxis_title="จำนวนโครงการ",
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            title_font_size=18,
+            title_x=0.5
+        )
+
+        fig.update_traces(
+            texttemplate='%{text}',
+            textposition='outside',
+            textfont_size=12
         )
 
         st.plotly_chart(fig, use_container_width=True)
+        
+        # Additional stats
+        col_stat1, col_stat2, col_stat3 = st.columns(3)
+        
+        with col_stat1:
+            total_projects = len(filtered_df)
+            st.markdown(
+                f'<div style="background: linear-gradient(45deg, #ff6b6b, #ee5a52); '
+                f'padding: 1rem; border-radius: 10px; text-align: center; color: white;">'
+                f'<h3>🎯</h3><h2>{total_projects:,}</h2><p>โครงการทั้งหมด</p></div>',
+                unsafe_allow_html=True
+            )
+        
+        with col_stat2:
+            unique_departments = filtered_df['หน่วยงาน'].nunique()
+            st.markdown(
+                f'<div style="background: linear-gradient(45deg, #4ecdc4, #44a08d); '
+                f'padding: 1rem; border-radius: 10px; text-align: center; color: white;">'
+                f'<h3>🏢</h3><h2>{unique_departments}</h2><p>หน่วยงาน</p></div>',
+                unsafe_allow_html=True
+            )
+        
+        with col_stat3:
+            unique_provinces = filtered_df['จังหวัด'].nunique()
+            st.markdown(
+                f'<div style="background: linear-gradient(45deg, #667eea, #764ba2); '
+                f'padding: 1rem; border-radius: 10px; text-align: center; color: white;">'
+                f'<h3>🗺️</h3><h2>{unique_provinces}</h2><p>จังหวัด</p></div>',
+                unsafe_allow_html=True
+            )
     else:
-        st.warning("ไม่มีข้อมูลที่จะแสดงในกราฟ")
+        st.markdown(
+            '<div style="text-align: center; padding: 3rem; color: #666;">'
+            '<h3>📊 ไม่มีข้อมูลที่จะแสดงในกราฟ</h3>'
+            '<p>กรุณาปรับเงื่อนไขการกรองใหม่</p>'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
-
-
-# --- Excel Download ---
+# --- Excel Download & Upload Section ---
 def to_excel_bytes(df_to_export):
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_to_export.to_excel(writer, index=False)
     return output.getvalue()
 
-col_up, spacer, col_dl = st.columns([2,3,1])
+st.markdown("---")
+st.markdown("### 🔄 จัดการข้อมูล")
+
+col_up, spacer, col_dl = st.columns([2, 1, 2])
 
 with col_dl:
     if not filtered_df.empty:
+        st.markdown("#### 📥 ดาวน์โหลดข้อมูล")
         st.download_button(
-            label="📥 ดาวน์โหลดข้อมูลที่กรองเป็น Excel",
+            label="💾 ดาวน์โหลดข้อมูลที่กรองเป็น Excel",
             data=to_excel_bytes(filtered_df),
-            file_name="filtered_data.xlsx",
+            file_name=f"filtered_data_{len(filtered_df)}_records.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-with spacer:
-    st.write("")
-
 with col_up:
-    st.markdown("📤 อัปโหลด Excel เพื่อเพิ่มข้อมูล")
-    uploaded_file = st.file_uploader("เลือกไฟล์ Excel", type=["xlsx"])
+    st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+    st.markdown("#### 📤 อัปโหลดข้อมูลใหม่")
+    st.markdown("เลือกไฟล์ Excel เพื่อเพิ่มข้อมูลเข้าสู่ระบบ")
+    
+    uploaded_file = st.file_uploader("🗂️ เลือกไฟล์ Excel", type=["xlsx"], key="file_uploader")
+    
     if uploaded_file:
         try:
-            uploaded_df = pd.read_excel(uploaded_file)
-            missing_cols = [col for col in required_columns if col not in uploaded_df.columns]
-            if missing_cols:
-                st.error(f"❌ คอลัมน์เหล่านี้หายไปจากไฟล์ที่อัปโหลด: {', '.join(missing_cols)}")
-            else:
-                supabase.table(TABLE_NAME).insert(uploaded_df.to_dict(orient="records")).execute()
-                project_names = uploaded_df['โครงการ'].dropna().unique().tolist()
-                sample_projects = ", ".join(project_names[:3])
-                more_text = "..." if len(project_names) > 3 else ""
-                st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว")
-                st.info(f"📌 โครงการที่เพิ่ม:\n{sample_projects}{more_text}")
-
-                st.balloons()  # 🎈
+            with st.spinner('⏳ กำลังประมวลผลไฟล์...'):
+                uploaded_df = pd.read_excel(uploaded_file)
+                missing_cols = [col for col in required_columns if col not in uploaded_df.columns]
+                
+                if missing_cols:
+                    st.error(f"❌ คอลัมน์เหล่านี้หายไปจากไฟล์ที่อัปโหลด: {', '.join(missing_cols)}")
+                else:
+                    # Insert data to Supabase
+                    supabase.table(TABLE_NAME).insert(uploaded_df.to_dict(orient="records")).execute()
+                    
+                    project_names = uploaded_df['โครงการ'].dropna().unique().tolist()
+                    sample_projects = ", ".join(project_names[:3])
+                    more_text = "..." if len(project_names) > 3 else ""
+                    
+                    st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df):,} แถวลงใน Supabase สำเร็จแล้ว")
+                    st.info(f"📌 โครงการที่เพิ่ม:\n{sample_projects}{more_text}")
+                    
+                    # Clear cache to show updated data
+                    st.cache_data.clear()
+                    st.balloons()  # 🎈
+                    st.rerun()
+                    
         except Exception as e:
-            st.error(f"เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
+            st.error(f"❌ เกิดข้อผิดพลาดขณะอ่านไฟล์: {e}")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Footer
+st.markdown("---")
+st.markdown(
+    '<div style="text-align: center; color: #666; padding: 1rem;">'
+    '<p>💻 ระบบจัดการข้อมูลงบประมาณ | สร้างด้วย Streamlit & Supabase</p>'
+    '</div>',
+    unsafe_allow_html=True
+)
