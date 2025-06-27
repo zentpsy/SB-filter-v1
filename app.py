@@ -136,10 +136,17 @@ with tab_chart:
             .size()
             .reset_index(name="จำนวนโครงการ")
         )
-# สร้างกราฟ Plotly
-import plotly.express as px
 
-        # สร้างกราฟ
+with tab_chart:
+    if not filtered_df.empty:
+        import plotly.express as px
+
+        chart_data = (
+            filtered_df.groupby(["ปีงบประมาณ", "รูปแบบงบประมาณ"])
+            .size()
+            .reset_index(name="จำนวนโครงการ")
+        )
+
         fig = px.bar(
             chart_data,
             x="ปีงบประมาณ",
@@ -149,28 +156,26 @@ import plotly.express as px
             text_auto=True,
             title="จำนวนโครงการตามรูปแบบงบประมาณในแต่ละปี"
         )
-        
-        # ปรับ layout ของ legend
+
         fig.update_layout(
             height=450,
-            margin=dict(l=20, r=20, t=50, b=100),  # เพิ่ม b เพื่อเว้นที่ให้ legend
+            margin=dict(l=20, r=20, t=50, b=100),
             legend=dict(
                 title="",
-                orientation="h",        # แนวนอน
-                yanchor="bottom",       # ยึดตามด้านล่างของกราฟ
-                y=-0.45,                # ขยับลงมาประมาณ 3 บรรทัด (ลองปรับได้)
-                xanchor="left",         # เริ่มจากซ้าย
-                x=0                     # ชิดซ้าย
+                orientation="h",
+                yanchor="bottom",
+                y=-0.45,
+                xanchor="left",
+                x=0
             ),
             xaxis_title="ปีงบประมาณ",
             yaxis_title="จำนวนโครงการ",
         )
-        
+
         st.plotly_chart(fig, use_container_width=True)
-
-
     else:
         st.warning("ไม่มีข้อมูลที่จะแสดงในกราฟ")
+
 
 
 # --- Excel Download ---
