@@ -132,7 +132,7 @@ def to_excel_bytes(df_to_export):
         df_to_export.to_excel(writer, index=False)
     return output.getvalue()
 
-col_up, spacer, col_dl = st.columns([1,2,1])
+col_up, col_suc, spacer, col_dl = st.columns([1,2,1,1])
 
 with col_dl:
     if not filtered_df.empty:
@@ -162,7 +162,7 @@ with col_up:
                 project_names = uploaded_df['โครงการ'].dropna().unique().tolist()
                 sample_projects = ", ".join(project_names[:3])  # แสดงชื่อแค่ 3 อันแรก
                 more_text = "..." if len(project_names) > 3 else ""
-
+with col_suc:
                 st.success(f"✅ เพิ่มข้อมูล {len(uploaded_df)} แถวลงใน Supabase สำเร็จแล้ว \n"
                            f"📌 โครงการที่เพิ่ม: {sample_projects}{more_text}")
 
