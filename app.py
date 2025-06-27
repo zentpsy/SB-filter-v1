@@ -124,7 +124,24 @@ filtered_df = filtered_df.drop(columns=[col for col in filtered_df.columns if no
 filtered_df = filtered_df[required_columns]
 
 st.dataframe(filtered_df, use_container_width=True)
+if not filtered_df.empty:
+    st.markdown("### 📊 กราฟจำนวนโครงการตามรูปแบบงบประมาณในแต่ละปี")
 
+    # แปลงปีงบประมาณให้เป็น str
+    grouped = (
+        filtered_df.groupby(["ปีงบประมาณ", "รูปแบบงบประมาณ"])
+        .size()
+        .reset_index(name="จำนวนโครงการ")
+    )
+
+    # Pivot เพื่อให้เหมาะกับ bar_chart
+    pivot_df = grouped.pivot(index="ปีงบประมาณ", columns="รูปแบบงบประมาณ", values="จำนวนโครงการ").fillna(0)
+
+    # Sort index ปี
+    pivot_df = pivot_df.sort_index()
+
+    # แสดงกราฟ
+    st.bar_chart(pivot_df)
 
 # --- Excel Download ---
 def to_excel_bytes(df_to_export):
