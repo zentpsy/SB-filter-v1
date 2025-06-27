@@ -126,19 +126,6 @@ import plotly.express as px
 
 with tab_chart:
     if not filtered_df.empty:
-        st.markdown("### 📊 จำนวนโครงการตามรูปแบบงบประมาณในแต่ละปี")
-
-        # เตรียมข้อมูล
-        filtered_df["ปีงบประมาณ"] = filtered_df["ปีงบประมาณ"].astype(str)
-
-        chart_data = (
-            filtered_df.groupby(["ปีงบประมาณ", "รูปแบบงบประมาณ"])
-            .size()
-            .reset_index(name="จำนวนโครงการ")
-        )
-
-with tab_chart:
-    if not filtered_df.empty:
         import plotly.express as px
 
         chart_data = (
