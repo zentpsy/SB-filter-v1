@@ -4,32 +4,66 @@ import re
 from io import BytesIO
 from supabase import create_client, Client
 
-def check_login():
-    if "logged_in" not in st.session_state:
-        st.session_state["logged_in"] = False
+import streamlit as st
 
-    if not st.session_state["logged_in"]:
-        with st.form("login_form", clear_on_submit=True):
-            st.subheader("🔐 กรุณาเข้าสู่ระบบ")
-            username = st.text_input("ชื่อผู้ใช้")
-            password = st.text_input("รหัสผ่าน", type="password")
-            submitted = st.form_submit_button("เข้าสู่ระบบ")
+# ---------------------------
+# 👤 ระบบล็อกอินเบื้องต้น
+# ---------------------------
+def login_page():
+    st.markdown(
+        """
+        <style>
+        .login-container {
+            max-width: 400px;
+            margin: 5% auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .login-sub {
+            color: gray;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        </style>
+        <div class="login-container">
+            <div class="login-title">🔐 เข้าสู่ระบบ</div>
+            <div class="login-sub">สำหรับเจ้าหน้าที่ที่ได้รับสิทธิ์เท่านั้น</div>
+        """,
+        unsafe_allow_html=True
+    )
 
-            if submitted:
-                credentials = st.secrets["auth"]
-                if username in credentials and credentials[username] == password:
-                    st.session_state["logged_in"] = True
-                    st.session_state["username"] = username
-                    st.success("✅ เข้าสู่ระบบสำเร็จ")
-                    st.rerun()
-                else:
-                    st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+    with st.form("login_form"):
+        username = st.text_input("👤 ชื่อผู้ใช้", placeholder="admin")
+        password = st.text_input("🔑 รหัสผ่าน", placeholder="••••••", type="password")
+        submitted = st.form_submit_button("➡️ เข้าสู่ระบบ")
 
-    return st.session_state["logged_in"]
+        if submitted:
+            credentials = st.secrets["auth"]
+            if username in credentials and credentials[username] == password:
+                st.session_state["logged_in"] = True
+                st.session_state["username"] = username
+                st.success("✅ เข้าสู่ระบบสำเร็จ")
+                st.rerun()
+            else:
+                st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
 
-# -- เรียกก่อนเริ่มโปรแกรม --
-if not check_login():
+    st.markdown("</div>", unsafe_allow_html=True)  # ปิด login-container
+
+# ---------------------------
+# ✅ เรียก Login
+# ---------------------------
+if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
+    login_page()
     st.stop()
+
 
 # --- Custom CSS ---
 st.markdown("""
