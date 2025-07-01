@@ -3,11 +3,8 @@ import pandas as pd
 import re
 from io import BytesIO
 from supabase import create_client, Client
-import streamlit as st
 
-import streamlit as st
-
-def modern_login():
+def simple_login():
     # ซ่อน Streamlit menu และ footer
     st.markdown("""
         <style>
@@ -16,25 +13,14 @@ def modern_login():
         header {visibility: hidden;}
         .stDeployButton {display:none;}
         
-        /* Import Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         /* Global Styling */
         .stApp {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 8s ease infinite;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3c72 100%);
+            font-family: 'Arial', sans-serif;
         }
         
         /* Main Container */
-        .login-wrapper {
+        .login-container {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -42,126 +28,99 @@ def modern_login():
             padding: 20px;
         }
         
-        .login-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 60px 50px;
+        .login-box {
+            background: white;
+            border-radius: 8px;
+            padding: 40px 35px;
             width: 100%;
-            max-width: 480px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
-            background-size: 300% 300%;
-            animation: shimmer 3s linear infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -300% 0; }
-            100% { background-position: 300% 0; }
-        }
-        
-        /* Header Section */
-        .login-header {
+            max-width: 350px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             text-align: center;
-            margin-bottom: 40px;
         }
         
-        .app-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 20px;
-            margin: 0 auto 24px;
+        /* Header */
+        .user-icon {
+            width: 70px;
+            height: 70px;
+            background: #34495e;
+            border-radius: 50%;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
-            animation: float 3s ease-in-out infinite;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .app-title {
-            font-size: 28px;
-            font-weight: 700;
             color: white;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 35px;
         }
         
-        .app-subtitle {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 400;
+        .login-title {
+            font-size: 24px;
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 30px;
         }
         
-        /* Form Styling */
+        /* Input Fields */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 18px;
+            z-index: 10;
+        }
+        
         .stTextInput > div > div > input {
-            background: rgba(255, 255, 255, 0.9) !important;
-            border: 2px solid rgba(255, 255, 255, 0.3) !important;
-            border-radius: 16px !important;
-            padding: 16px 20px !important;
+            background: #ecf0f1 !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 15px 20px 15px 50px !important;
             font-size: 16px !important;
-            color: #334155 !important;
-            transition: all 0.3s ease !important;
-            backdrop-filter: blur(10px) !important;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: rgba(255, 255, 255, 0.8) !important;
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1) !important;
-            background: rgba(255, 255, 255, 1) !important;
+            color: #2c3e50 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
         
         .stTextInput > div > div > input::placeholder {
-            color: #94a3b8 !important;
+            color: #95a5a6 !important;
             opacity: 1 !important;
         }
         
-        /* Labels */
+        .stTextInput > div > div > input:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3) !important;
+            background: #ffffff !important;
+        }
+        
+        /* Hide default labels */
         .stTextInput > label {
-            color: white !important;
-            font-weight: 500 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
+            display: none !important;
         }
         
         /* Submit Button */
         .stButton > button {
             width: 100% !important;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+            background: #34495e !important;
             color: white !important;
             border: none !important;
-            border-radius: 16px !important;
-            padding: 16px 24px !important;
+            border-radius: 25px !important;
+            padding: 15px 24px !important;
             font-size: 16px !important;
             font-weight: 600 !important;
-            margin-top: 24px !important;
+            margin-top: 10px !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 8px 25px rgba(238, 90, 36, 0.3) !important;
             text-transform: none !important;
         }
         
         .stButton > button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 12px 35px rgba(238, 90, 36, 0.4) !important;
-            background: linear-gradient(135deg, #ee5a24, #ff6b6b) !important;
+            background: #2c3e50 !important;
+            transform: translateY(-1px) !important;
         }
         
         .stButton > button:active {
@@ -175,76 +134,74 @@ def modern_login():
             padding: 0 !important;
         }
         
-        /* Footer */
-        .login-footer {
+        /* Forgot Password Link */
+        .forgot-password {
+            margin-top: 20px;
             text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 12px;
-            font-weight: 500;
+        .forgot-password a {
+            color: #7f8c8d;
+            font-size: 14px;
+            text-decoration: none;
         }
         
-        /* Success/Error Messages */
+        .forgot-password a:hover {
+            color: #34495e;
+            text-decoration: underline;
+        }
+        
+        /* Messages */
         .stAlert {
-            border-radius: 12px !important;
-            backdrop-filter: blur(10px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 8px !important;
+            margin-top: 15px !important;
         }
         
         /* Spinner */
         .stSpinner > div {
-            border-top-color: white !important;
+            border-top-color: #34495e !important;
         }
         </style>
     """, unsafe_allow_html=True)
     
     # HTML Structure
     st.markdown("""
-        <div class="login-wrapper">
-            <div class="login-card">
-                <div class="login-header">
-                    <div class="app-logo">🚀</div>
-                    <h1 class="app-title">ระบบจัดการ</h1>
-                    <p class="app-subtitle">เข้าสู่ระบบเพื่อดำเนินการต่อ</p>
-                </div>
+        <div class="login-container">
+            <div class="login-box">
+                <div class="user-icon">👤</div>
+                <h2 class="login-title">User Login</h2>
     """, unsafe_allow_html=True)
     
     # Login Form
-    with st.form("auth_form", clear_on_submit=False):
-        col1, col2 = st.columns([1, 4])
-        with col2:
-            username = st.text_input(
-                "👤 ชื่อผู้ใช้",
-                placeholder="กรอกชื่อผู้ใช้ของคุณ",
-                key="username_input"
-            )
-            
-            password = st.text_input(
-                "🔐 รหัสผ่าน",
-                placeholder="กรอกรหัสผ่านของคุณ",
-                type="password",
-                key="password_input"
-            )
-            
-            login_btn = st.form_submit_button("เข้าสู่ระบบ 🔓")
+    with st.form("login_form", clear_on_submit=False):
+        # Username input with icon
+        st.markdown('<div class="input-group"><div class="input-icon">👤</div></div>', unsafe_allow_html=True)
+        username = st.text_input(
+            "username",
+            placeholder="Username",
+            key="user_input",
+            label_visibility="collapsed"
+        )
+        
+        # Password input with icon  
+        st.markdown('<div class="input-group"><div class="input-icon">🔒</div></div>', unsafe_allow_html=True)
+        password = st.text_input(
+            "password",
+            placeholder="••••••••",
+            type="password",
+            key="pass_input",
+            label_visibility="collapsed"
+        )
+        
+        # Submit button
+        login_btn = st.form_submit_button("Log In")
     
     # Handle Login
     if login_btn:
         if username and password:
-            with st.spinner("🔍 กำลังตรวจสอบข้อมูล..."):
+            with st.spinner("Authenticating..."):
                 import time
-                time.sleep(1.5)  # Simulate authentication delay
+                time.sleep(1)
                 
                 try:
                     # ตรวจสอบข้อมูลจาก secrets
@@ -253,23 +210,21 @@ def modern_login():
                     if username in credentials and credentials[username] == password:
                         st.session_state["logged_in"] = True
                         st.session_state["username"] = username
-                        st.success("🎉 เข้าสู่ระบบสำเร็จ! กำลังโหลดระบบ...")
+                        st.success("✅ Login successful! Redirecting...")
                         time.sleep(1)
                         st.rerun()
                     else:
-                        st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+                        st.error("❌ Invalid username or password")
                         
                 except Exception as e:
-                    st.error("⚠️ เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง")
+                    st.error("⚠️ System error. Please try again.")
         else:
-            st.warning("⚠️ กรุณากรอกชื่อผู้ใช้และรหัสผ่าน")
+            st.warning("⚠️ Please enter username and password")
     
-    # Footer
+    # Forgot Password Link
     st.markdown("""
-                <div class="login-footer">
-                    <div class="security-badge">
-                        🔒 ระบบปลอดภัย SSL
-                    </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot Password?</a>
                 </div>
             </div>
         </div>
@@ -277,12 +232,12 @@ def modern_login():
 
 # ตรวจสอบสถานะการล็อกอิน
 if "logged_in" not in st.session_state or not st.session_state.get("logged_in", False):
-    modern_login()
+    simple_login()
     st.stop()
 else:
-    # หน้าหลักของแอป (เพิ่มโค้ดหน้าหลักที่นี่)
-    st.success(f"ยินดีต้อนรับ {st.session_state.get('username', 'ผู้ใช้')}!")
-    if st.button("ออกจากระบบ"):
+    # หน้าหลักของแอป
+    st.success(f"Welcome {st.session_state.get('username', 'User')}!")
+    if st.button("Logout"):
         st.session_state.clear()
         st.rerun()
 
