@@ -4,8 +4,6 @@ import re
 from io import BytesIO
 from supabase import create_client, Client
 
-import streamlit as st
-
 # ---------------------------
 # 👤 ระบบล็อกอินเบื้องต้น
 # ---------------------------
