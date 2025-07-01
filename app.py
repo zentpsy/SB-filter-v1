@@ -3,57 +3,248 @@ import pandas as pd
 import re
 from io import BytesIO
 from supabase import create_client, Client
+import streamlit as st
 
 # ---------------------------
-# 👤 ระบบล็อกอินเบื้องต้น
+# 👤 ระบบล็อกอินเบื้องต้น (Enhanced Version)
 # ---------------------------
 def login_page():
     st.markdown(
         """
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        .stApp {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+        }
+        
         .login-container {
-            max-width: 400px;
-            margin: 5% auto;
-            padding: 40px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 450px;
+            margin: 8% auto;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradient 3s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .login-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         .login-title {
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 32px;
+            font-weight: 700;
             margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
         }
+        
         .login-sub {
-            color: gray;
+            color: #64748b;
             font-size: 16px;
+            margin-bottom: 40px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+        
+        .welcome-text {
+            color: #475569;
+            font-size: 14px;
             margin-bottom: 30px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        /* Custom input styling */
+        .stTextInput > div > div > input {
+            border-radius: 12px !important;
+            border: 2px solid #e2e8f0 !important;
+            padding: 15px 20px !important;
+            font-size: 16px !important;
+            transition: all 0.3s ease !important;
+            background: rgba(255,255,255,0.8) !important;
+        }
+        
+        .stTextInput > div > div > input:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+            background: rgba(255,255,255,1) !important;
+        }
+        
+        /* Custom button styling */
+        .stButton > button {
+            width: 100% !important;
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            color: white !important;
+            border: none !important;
+            padding: 15px 25px !important;
+            border-radius: 12px !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            margin-top: 20px !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+        }
+        
+        .stButton > button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+        }
+        
+        .stButton > button:active {
+            transform: translateY(0px) !important;
+        }
+        
+        /* Custom form styling */
+        .stForm {
+            background: transparent !important;
+            border: none !important;
+        }
+        
+        /* Success/Error messages */
+        .stAlert {
+            border-radius: 12px !important;
+            margin-top: 20px !important;
+        }
+        
+        /* Hide Streamlit elements */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        
+        .security-note {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(239, 246, 255, 0.5);
+            border-radius: 10px;
+            font-size: 12px;
+            color: #64748b;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .feature-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            opacity: 0.7;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            color: #667eea;
         }
         </style>
-        <div class="login-container">
-            <div class="login-title">🔐 เข้าสู่ระบบ</div>
-            <div class="login-sub">สำหรับเจ้าหน้าที่ที่ได้รับสิทธิ์เท่านั้น</div>
         """,
         unsafe_allow_html=True
     )
-
+    
+    st.markdown(
+        """
+        <div class="login-container">
+            <div class="login-icon">🔐</div>
+            <div class="login-title">เข้าสู่ระบบ</div>
+            <div class="login-sub">ระบบจัดการสำหรับเจ้าหน้าที่ที่ได้รับสิทธิ์</div>
+            <div class="welcome-text">
+                <strong>🎯 ยินดีต้อนรับ</strong><br>
+                กรุณาป้อนข้อมูลการเข้าสู่ระบบของคุณเพื่อดำเนินการต่อ
+            </div>
+            <div class="feature-icons">
+                <span class="feature-icon">🛡️</span>
+                <span class="feature-icon">⚡</span>
+                <span class="feature-icon">🎨</span>
+            </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
     with st.form("login_form"):
-        username = st.text_input("👤 ชื่อผู้ใช้", placeholder="admin")
-        password = st.text_input("🔑 รหัสผ่าน", placeholder="••••••", type="password")
-        submitted = st.form_submit_button("➡️ เข้าสู่ระบบ")
-
+        st.markdown("### 📋 ข้อมูลการเข้าสู่ระบบ")
+        username = st.text_input(
+            "👤 ชื่อผู้ใช้", 
+            placeholder="กรุณาป้อนชื่อผู้ใช้",
+            help="ชื่อผู้ใช้ที่ได้รับจากผู้ดูแลระบบ"
+        )
+        password = st.text_input(
+            "🔑 รหัสผ่าน", 
+            placeholder="กรุณาป้อนรหัสผ่าน",
+            type="password",
+            help="รหัสผ่านที่ได้รับจากผู้ดูแลระบบ"
+        )
+        
+        submitted = st.form_submit_button("🚀 เข้าสู่ระบบ")
+        
         if submitted:
-            credentials = st.secrets["auth"]
-            if username in credentials and credentials[username] == password:
-                st.session_state["logged_in"] = True
-                st.session_state["username"] = username
-                st.success("✅ เข้าสู่ระบบสำเร็จ")
-                st.rerun()
-            else:
-                st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
-
-    st.markdown("</div>", unsafe_allow_html=True)  # ปิด login-container
+            # แสดง loading spinner
+            with st.spinner('🔄 กำลังตรวจสอบข้อมูล...'):
+                import time
+                time.sleep(1)  # Simulate loading time
+                
+                # ตรวจสอบข้อมูลการเข้าสู่ระบบ
+                try:
+                    credentials = st.secrets["auth"]
+                    if username in credentials and credentials[username] == password:
+                        st.session_state["logged_in"] = True
+                        st.session_state["username"] = username
+                        st.success("✅ เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนหน้า...")
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง")
+                except Exception as e:
+                    st.error("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาติดต่อผู้ดูแลระบบ")
+    
+    st.markdown(
+        """
+            <div class="security-note">
+                🔒 <strong>ความปลอดภัย:</strong> ข้อมูลการเข้าสู่ระบบของคุณได้รับการเข้ารหัสและปกป้องอย่างปลอดภัย<br>
+                📞 หากมีปัญหาการเข้าสู่ระบบ กรุณาติดต่อผู้ดูแลระบบ
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # ---------------------------
 # ✅ เรียก Login
