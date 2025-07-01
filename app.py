@@ -4,6 +4,33 @@ import re
 from io import BytesIO
 from supabase import create_client, Client
 
+def check_login():
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
+
+    if not st.session_state["logged_in"]:
+        with st.form("login_form", clear_on_submit=True):
+            st.subheader("🔐 กรุณาเข้าสู่ระบบ")
+            username = st.text_input("ชื่อผู้ใช้")
+            password = st.text_input("รหัสผ่าน", type="password")
+            submitted = st.form_submit_button("เข้าสู่ระบบ")
+
+            if submitted:
+                credentials = st.secrets["auth"]
+                if username in credentials and credentials[username] == password:
+                    st.session_state["logged_in"] = True
+                    st.session_state["username"] = username
+                    st.success("✅ เข้าสู่ระบบสำเร็จ")
+                    st.rerun()
+                else:
+                    st.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+
+    return st.session_state["logged_in"]
+
+# -- เรียกก่อนเริ่มโปรแกรม --
+if not check_login():
+    st.stop()
+
 # --- Custom CSS ---
 st.markdown("""
 <style>
