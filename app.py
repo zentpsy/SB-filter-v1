@@ -4,242 +4,186 @@ import re
 from io import BytesIO
 from supabase import create_client, Client
 
-def simple_login():
-    # ซ่อน Streamlit menu และ footer
-    st.markdown("""
-        <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
-        .stDeployButton {display:none;}
-        
-        /* Global Styling */
-        .stApp {
-            background: linear-gradient(135deg, #2c5aa0 0%, #1e3c72 100%);
-            font-family: 'Arial', sans-serif;
-        }
-        
-        /* Main Container */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .login-box {
-            background: white;
-            border-radius: 8px;
-            padding: 40px 35px;
-            width: 100%;
-            max-width: 350px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-        }
-        
-        /* Header */
-        .user-icon {
-            width: 70px;
-            height: 70px;
-            background: #34495e;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 35px;
-        }
-        
-        .login-title {
-            font-size: 24px;
-            color: #34495e;
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-        
-        /* Input Fields */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #7f8c8d;
-            font-size: 18px;
-            z-index: 10;
-        }
-        
-        .stTextInput > div > div > input {
-            background: #ecf0f1 !important;
-            border: none !important;
-            border-radius: 25px !important;
-            padding: 15px 20px 15px 50px !important;
-            font-size: 16px !important;
-            color: #2c3e50 !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-        
-        .stTextInput > div > div > input::placeholder {
-            color: #95a5a6 !important;
-            opacity: 1 !important;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            outline: none !important;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3) !important;
-            background: #ffffff !important;
-        }
-        
-        /* Hide default labels */
-        .stTextInput > label {
-            display: none !important;
-        }
-        
-        /* Submit Button */
-        .stButton > button {
-            width: 100% !important;
-            background: #34495e !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 25px !important;
-            padding: 15px 24px !important;
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            margin-top: 10px !important;
-            transition: all 0.3s ease !important;
-            text-transform: none !important;
-        }
-        
-        .stButton > button:hover {
-            background: #2c3e50 !important;
-            transform: translateY(-1px) !important;
-        }
-        
-        .stButton > button:active {
-            transform: translateY(0px) !important;
-        }
-        
-        /* Form Container */
-        .stForm {
-            background: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        
-        /* Forgot Password Link */
-        .forgot-password {
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .forgot-password a {
-            color: #7f8c8d;
-            font-size: 14px;
-            text-decoration: none;
-        }
-        
-        .forgot-password a:hover {
-            color: #34495e;
-            text-decoration: underline;
-        }
-        
-        /* Messages */
-        .stAlert {
-            border-radius: 8px !important;
-            margin-top: 15px !important;
-        }
-        
-        /* Spinner */
-        .stSpinner > div {
-            border-top-color: #34495e !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    
-    # HTML Structure
-    st.markdown("""
-        <div class="login-container">
-            <div class="login-box">
-                <div class="user-icon">👤</div>
-                <h2 class="login-title">User Login</h2>
-    """, unsafe_allow_html=True)
-    
-    # Login Form
-    with st.form("login_form", clear_on_submit=False):
-        # Username input with icon
-        st.markdown('<div class="input-group"><div class="input-icon">👤</div></div>', unsafe_allow_html=True)
-        username = st.text_input(
-            "username",
-            placeholder="Username",
-            key="user_input",
-            label_visibility="collapsed"
-        )
-        
-        # Password input with icon  
-        st.markdown('<div class="input-group"><div class="input-icon">🔒</div></div>', unsafe_allow_html=True)
-        password = st.text_input(
-            "password",
-            placeholder="••••••••",
-            type="password",
-            key="pass_input",
-            label_visibility="collapsed"
-        )
-        
-        # Submit button
-        login_btn = st.form_submit_button("Log In")
-    
-    # Handle Login
-    if login_btn:
-        if username and password:
-            with st.spinner("Authenticating..."):
-                import time
-                time.sleep(1)
-                
-                try:
-                    # ตรวจสอบข้อมูลจาก secrets
-                    credentials = st.secrets.get("auth", {})
-                    
-                    if username in credentials and credentials[username] == password:
-                        st.session_state["logged_in"] = True
-                        st.session_state["username"] = username
-                        st.success("✅ Login successful! Redirecting...")
-                        time.sleep(1)
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid username or password")
-                        
-                except Exception as e:
-                    st.error("⚠️ System error. Please try again.")
-        else:
-            st.warning("⚠️ Please enter username and password")
-    
-    # Forgot Password Link
-    st.markdown("""
-                <div class="forgot-password">
-                    <a href="#">Forgot Password?</a>
-                </div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+import streamlit as st
+import time
 
-# ตรวจสอบสถานะการล็อกอิน
-if "logged_in" not in st.session_state or not st.session_state.get("logged_in", False):
-    simple_login()
-    st.stop()
-else:
-    # หน้าหลักของแอป
-    st.success(f"Welcome {st.session_state.get('username', 'User')}!")
-    if st.button("Logout"):
-        st.session_state.clear()
+# ตั้งค่าหน้าเว็บ
+st.set_page_config(
+    page_title="User Login",
+    page_icon="👤",
+    layout="centered"
+)
+
+# CSS สำหรับจัดแต่งหน้าตา
+st.markdown("""
+<style>
+    /* พื้นหลังแบบ gradient */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* ซ่อน header และ footer ของ Streamlit */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* สไตล์สำหรับกล่อง login */
+    .login-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        max-width: 400px;
+        margin: 2rem auto;
+    }
+    
+    /* สไตล์สำหรับไอคอนผู้ใช้ */
+    .user-icon {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .user-icon-circle {
+        width: 80px;
+        height: 80px;
+        background-color: #4a5568;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    /* สไตล์สำหรับหัวข้อ */
+    .login-title {
+        text-align: center;
+        color: #2d3748;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+    
+    /* สไตล์สำหรับ input fields */
+    .stTextInput > div > div > input {
+        border-radius: 5px;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+    }
+    
+    /* สไตล์สำหรับปุ่ม login */
+    .login-button {
+        width: 100%;
+        background-color: #4299e1;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+    
+    .login-button:hover {
+        background-color: #3182ce;
+    }
+    
+    /* สไตล์สำหรับลิงก์ Forgot Password */
+    .forgot-password {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .forgot-password a {
+        color: #a0aec0;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .forgot-password a:hover {
+        color: #4299e1;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ฟังก์ชันตรวจสอบการ login
+def authenticate(username, password):
+    # ใส่ logic การตรวจสอบผู้ใช้ที่นี่
+    # ตัวอย่างนี้ใช้ username: admin, password: password123
+    return username == "admin" and password == "password123"
+
+# สร้าง session state สำหรับเก็บสถานะ login
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+
+# หากล็อกอินสำเร็จแล้ว
+if st.session_state.logged_in:
+    st.success("🎉 เข้าสู่ระบบสำเร็จ!")
+    st.write("ยินดีต้อนรับเข้าสู่ระบบ!")
+    
+    if st.button("ออกจากระบบ"):
+        st.session_state.logged_in = False
         st.rerun()
+else:
+    # สร้างหน้า login
+    st.markdown('<div class="login-container">', unsafe_allow_html=True)
+    
+    # ไอคอนผู้ใช้
+    st.markdown("""
+    <div class="user-icon">
+        <div class="user-icon-circle">
+            <svg width="40" height="40" fill="white" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # หัวข้อ
+    st.markdown('<h2 class="login-title">User Login</h2>', unsafe_allow_html=True)
+    
+    # ฟอร์ม login
+    with st.form("login_form"):
+        username = st.text_input(
+            "Username", 
+            placeholder="Username",
+            label_visibility="collapsed"
+        )
+        
+        password = st.text_input(
+            "Password", 
+            type="password",
+            placeholder="••••••",
+            label_visibility="collapsed"
+        )
+        
+        # ปุ่ม login
+        login_clicked = st.form_submit_button("Log In", use_container_width=True)
+        
+        if login_clicked:
+            if username and password:
+                if authenticate(username, password):
+                    st.session_state.logged_in = True
+                    st.success("เข้าสู่ระบบสำเร็จ!")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+            else:
+                st.error("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน")
+    
+    # ลิงก์ Forgot Password
+    st.markdown("""
+    <div class="forgot-password">
+        <a href="#" onclick="alert('ติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน')">Forgot Password?</a>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # แสดงข้อมูล demo
+    st.markdown("---")
+    st.info("**Demo Account:**\n- Username: admin\n- Password: password123")
 
 # --- Custom CSS ---
 st.markdown("""
